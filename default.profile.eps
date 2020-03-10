@@ -1,0 +1,65 @@
+
+$Global:ProfileLoaded = $false
+
+function Global:Import-Profile
+{
+    [CmdletBinding()]
+    param()
+
+    if ($PSBoundParameters.Keys.Contains('Debug'))
+    {
+        $DebugPreference = 'Continue'
+    }
+
+    Write-Debug -Message ('[0ms] [BEGIN] {0}' -f $MyInvocation.MyCommand)
+    $startedAt = Get-Date
+    function Write-Timing
+    {
+        param(
+            [Parameter(Mandatory)]
+            [ValidateSet('BEGIN','COMPLETE')]
+            [string]$Status,
+
+            [Parameter(Mandatory)]
+            [string]$Message
+        )
+
+        $elapsedMs = ((Get-Date) - $startedAt).TotalMilliseconds
+        $elapsedMs = [Math]::Round($elapsedMs)
+
+        Write-Debug -Message ('[{0}ms] [{1}] {2}' -f $elapsedMs, $Status, $Message)
+    }
+
+    $profilesRepoRoot = '<%= $profilesRepoRoot %>'
+
+    $profilesToLoad = @(
+        <%- foreach ($item in $profilesToLoad) { -%>
+        '<%= $item %>'
+        <%- } -%>
+    )
+
+    if (-not $profilesToLoad)
+    {
+        Write-Warning -Message ('No profile paths defined in "{0}".' -f $PSCommandPath)
+        return
+    }
+
+    foreach ($profile in $profilesToLoad)
+    {
+        $profilePath = Join-Path -Path $profilesRepoRoot -ChildPath ('profiles/{0}.ps1' -f $profile) -Resolve
+
+        # Execute, not dot source, scripts here.
+        # Profile scripts should be intentional with what they export by using
+        # the 'Global:' scope modifier.
+        Write-Verbose -Message ('Loading "{0}"' -f $profilePath)
+        Write-Timing -Status 'BEGIN' -Message ('Load "{0}" profile' -f $profile)
+        & $profilePath
+        Write-Timing -Status 'COMPLETE' -Message ('Load "{0}" profile' -f $profile)
+    }
+
+    Write-Verbose -Message 'Profile Loaded'
+    Write-Timing -Status 'COMPLETE' -Message $MyInvocation.MyCommand
+    $Global:ProfileLoaded = $true
+}
+
+Set-Alias -Name 'imp' -Value Import-Profile -Scope 'Global'
