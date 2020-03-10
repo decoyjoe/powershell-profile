@@ -53,13 +53,27 @@ if ((Test-Path -Path $destinationProfilePath -PathType Leaf) -and -not $Force)
     return
 }
 
+New-Item -Path ($destinationProfilePath | Split-Path -Parent) -ItemType Container -Force | Write-Verbose
 Copy-Item -Path $defaultProfilePath -Destination $destinationProfilePath -Force
 
-if( -not (Get-Module 'EPS' -ListAvailable -Verbose:$false) )
+# Install any modules necessary for the install script or used by any profiles
+# I only want to have to do this once and not re-check for modules everytime the
+# profiles are loaded
+$modulesToInstall = @(
+    'EPS'
+    'oh-my-posh'
+    'Pester'
+    'posh-git'
+)
+
+foreach ($module in $modulesToInstall)
 {
-    $repository = Find-Module -Name 'EPS' | Select-Object -First 1 -ExpandProperty 'Repository'
-    Write-Verbose -Message 'Installing EPS module'
-    Install-Module -Name 'EPS' -Scope CurrentUser -Repository $repository
+    if( -not (Get-Module $module -ListAvailable -Verbose:$false) )
+    {
+        $repository = Find-Module -Name $module | Select-Object -First 1 -ExpandProperty 'Repository'
+        Write-Verbose -Message 'Installing EPS module'
+        Install-Module -Name $module -Scope CurrentUser -Repository $repository -Verbose:$false
+    }
 }
 
 Import-Module -Name 'EPS' -Verbose:$false
