@@ -11,8 +11,6 @@ if (Get-Module -Name 'PSReadLine') {
     Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
     Set-PSReadlineKeyHandler -Key Tab -Function Complete
-    Set-PSReadlineKeyHandler -Key "Ctrl+Spacebar" -Function PossibleCompletions
-    Set-PSReadlineKeyHandler -Key "Ctrl+Alt+Spacebar" -Function MenuComplete
     Set-PSReadlineKeyHandler -Key "Ctrl+l" -Function ClearScreen
     Set-PSReadlineKeyHandler -Key "Enter" -Function AcceptLine
 
@@ -21,6 +19,8 @@ if (Get-Module -Name 'PSReadLine') {
         [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
     }
 
+    # Needed to get Ctrl+v paste working for pwsh in WSL
+    Set-PSReadLineKeyHandler -Key Ctrl+v -Function Paste
 
     # These "smart" handlers in the rest of the file were pulled from the sample
     # profile in the PSReadLine repo:
