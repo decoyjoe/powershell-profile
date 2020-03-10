@@ -4,7 +4,10 @@ $Global:ProfileLoaded = $false
 function Global:Import-Profile
 {
     [CmdletBinding()]
-    param()
+    param(
+        # Don't set the theme/prompt
+        [switch]$SkipTheme
+    )
 
     if ($PSBoundParameters.Keys.Contains('Debug'))
     {
@@ -55,6 +58,16 @@ function Global:Import-Profile
         Write-Timing -Status 'BEGIN' -Message ('Load "{0}" profile' -f $profile)
         & $profilePath
         Write-Timing -Status 'COMPLETE' -Message ('Load "{0}" profile' -f $profile)
+    }
+
+    if (-not $SkipTheme)
+    {
+        Write-Timing -Status 'BEGIN' -Message 'Import module "oh-my-posh"'
+        Import-Module -Name 'oh-my-posh'
+        Write-Timing -Status 'COMPLETE' -Message 'Import module "oh-my-posh"'
+
+        $Global:ThemeSettings.MyThemesLocation = '<%= $myThemesLocation %>'
+        Set-Theme -name '<%= $themeName %>'
     }
 
     Write-Verbose -Message 'Profile Loaded'

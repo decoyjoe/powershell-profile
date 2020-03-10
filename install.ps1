@@ -23,6 +23,10 @@ param(
     # List of profile names, from the `profiles` directory, to enable in the PowerShell profile script.
     [String[]]$ProfileName,
 
+    [Parameter(Mandatory)]
+    # Name of theme to set in the profile.
+    [String]$ThemeName,
+
     # Overwrite an existing profile script.
     [switch]$Force
 )
@@ -62,7 +66,9 @@ Import-Module -Name 'EPS' -Verbose:$false
 
 $templateBindings = @{
     'profilesRepoRoot' = $PSScriptRoot
-    'profilesToLoad' = $ProfileName
+    'profilesToLoad'   = $ProfileName
+    'myThemesLocation' = (Join-Path -Path $PSScriptRoot -ChildPath 'oh-my-posh_themes' -Resolve)
+    'themeName'        = $ThemeName
 }
 
 $profileContent = Invoke-EpsTemplate -Path $destinationProfilePath -Safe -Binding $templateBindings
