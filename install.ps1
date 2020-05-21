@@ -57,8 +57,9 @@ New-Item -Path ($destinationProfilePath | Split-Path -Parent) -ItemType Containe
 Copy-Item -Path $defaultProfilePath -Destination $destinationProfilePath -Force
 
 # Install any modules necessary for the install script or used by any profiles
-# I only want to have to do this once and not re-check for modules everytime the
-# profiles are loaded
+# I only want to have to do this once and not inlcude logic in the profile to
+# check for required modules everytime the profiles are loaded. Let it fail if
+# modules are missing.
 $modulesToInstall = @(
     'EPS'
     'oh-my-posh'
@@ -71,7 +72,7 @@ foreach ($module in $modulesToInstall)
     if( -not (Get-Module $module -ListAvailable -Verbose:$false) )
     {
         $repository = Find-Module -Name $module | Select-Object -First 1 -ExpandProperty 'Repository'
-        Write-Verbose -Message 'Installing EPS module'
+        Write-Verbose -Message "Installing $module module for current user"
         Install-Module -Name $module -Scope CurrentUser -Repository $repository -Verbose:$false
     }
 }
