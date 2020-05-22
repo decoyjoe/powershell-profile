@@ -14,7 +14,9 @@ function Global:Import-Profile
         $DebugPreference = 'Continue'
     }
 
-    Write-Debug -Message ('[0ms] [BEGIN] {0}' -f $MyInvocation.MyCommand)
+    Write-Debug -Message ('[0000ms]  [BEGIN] {0}' -f $MyInvocation.MyCommand)
+    $Global:timingIndentCount = 4
+
     $startedAt = Get-Date
     function Write-Timing
     {
@@ -27,10 +29,25 @@ function Global:Import-Profile
             [string]$Message
         )
 
-        $elapsedMs = ((Get-Date) - $startedAt).TotalMilliseconds
-        $elapsedMs = [Math]::Round($elapsedMs)
+        if ($Status -eq 'COMPLETE') {
+            $Global:timingIndentCount = $timingIndentCount - 2
+            $messagePadding = 1
+        }
+        else {
+            $messagePadding = 4
+        }
 
-        Write-Debug -Message ('[{0}ms] [{1}] {2}' -f $elapsedMs, $Status, $Message)
+        $elapsedMs = ((Get-Date) - $startedAt).TotalMilliseconds
+        [int]$elapsedMs = [Math]::Round($elapsedMs)
+
+        $indentation = ' ' * $timingIndentCount
+        $padding = ' ' * $messagePadding
+
+        Write-Debug -Message ('[{0:d4}ms]{1}[{2}]{3}{4}' -f $elapsedMs, $indentation, $Status, $padding, $Message)
+
+        if ($Status -eq 'BEGIN') {
+            $Global:timingIndentCount = $timingIndentCount + 2
+        }
     }
 
     $profilesRepoRoot = '<%= $profilesRepoRoot %>'
@@ -72,7 +89,9 @@ function Global:Import-Profile
 
     Write-Verbose -Message 'Profile Loaded'
     Write-Timing -Status 'COMPLETE' -Message $MyInvocation.MyCommand
+
     $Global:ProfileLoaded = $true
+    Remove-Variable -Name 'timingIndentCount' -Scope 'Global' -Force
 }
 
 Set-Alias -Name 'imp' -Value Import-Profile -Scope 'Global'
