@@ -75,10 +75,19 @@ function Write-Theme {
 
     # Writes the postfixes to the prompt
     $prompt += Write-Prompt -Object ($sl.PromptSymbols.PromptIndicator) -ForegroundColor $promtSymbolColor
-    
+
     $prompt += ' '
     $prompt
 }
+
+# https://github.com/PowerShell/PSReadLine/issues/1541
+$esc = [char]0x1b # escape character
+$pc = [char]0x276f # prompt character ❯
+
+Set-PSReadLineOption -PromptText (
+    "$esc[92m$pc$esc[0m ", # Bright Green
+    "$esc[91m$pc$esc[0m "  # Bright Red
+)
 
 $sl = $global:ThemeSettings #local settings
 $sl.PromptSymbols.PromptIndicator = [char]::ConvertFromUtf32(0x276f)

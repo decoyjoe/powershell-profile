@@ -50,6 +50,9 @@ function Global:Import-Profile
         }
     }
 
+    # https://github.com/PowerShell/PSReadLine/issues/1541#issuecomment-632899981
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
     $profilesRepoRoot = '<%= $profilesRepoRoot %>'
 
     $profilesToLoad = @(
@@ -95,3 +98,4 @@ function Global:Import-Profile
 }
 
 Set-Alias -Name 'imp' -Value Import-Profile -Scope 'Global'
+Import-Profile
