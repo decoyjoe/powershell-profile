@@ -1,11 +1,5 @@
 if (Get-Module -Name 'PSReadLine') {
 
-    # https://github.com/microsoft/terminal/issues/755#issuecomment-546405069
-    # if (Test-Path -Path 'Env:\WT_SESSION')
-    # {
-    #     Set-PSReadLineKeyHandler -Key Ctrl+h -Function BackwardKillWord
-    # }
-
     Set-PSReadlineKeyHandler -Key UpArrow   -Function HistorySearchBackward
     Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
     Set-PSReadLineOption -HistorySearchCursorMovesToEnd
