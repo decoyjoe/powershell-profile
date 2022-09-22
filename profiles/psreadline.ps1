@@ -7,6 +7,7 @@ if (Get-Module -Name 'PSReadLine') {
     Set-PSReadlineKeyHandler -Key Tab -Function Complete
     Set-PSReadlineKeyHandler -Key "Ctrl+l" -Function ClearScreen
     Set-PSReadlineKeyHandler -Key "Enter" -Function AcceptLine
+    Set-PSReadlineKeyHandler -Key "Ctrl+d" -Function DeleteCharOrExit
 
     Set-PSReadlineKeyHandler -Key "Ctrl+Alt+U" -ScriptBlock {
         Set-Location -Path (Get-Location | Split-Path)
