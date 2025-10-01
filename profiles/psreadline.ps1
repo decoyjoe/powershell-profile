@@ -38,45 +38,6 @@ if (Get-Module -Name 'PSReadLine') {
         [Microsoft.Powershell.PSConsoleReadLine]::RevertLine()
     }
 
-    # F1 for help on the command line - naturally
-    Set-PSReadlineKeyHandler -Key F1 `
-                             -BriefDescription CommandHelp `
-                             -LongDescription "Open the help window for the current command" `
-                             -ScriptBlock {
-        param($key, $arg)
-
-        $ast = $null
-        $tokens = $null
-        $errors = $null
-        $cursor = $null
-        [Microsoft.Powershell.PSConsoleReadLine]::GetBufferState([ref]$ast, [ref]$tokens, [ref]$errors, [ref]$cursor)
-
-        $commandAst = $ast.FindAll( {
-            $node = $args[0]
-            $node -is [System.Management.Automation.Language.CommandAst] -and
-                $node.Extent.StartOffset -le $cursor -and
-                $node.Extent.EndOffset -ge $cursor
-            }, $true) | Select-Object -Last 1
-
-        if ($commandAst -ne $null)
-        {
-            $commandName = $commandAst.GetCommandName()
-            if ($commandName -ne $null)
-            {
-                $command = $ExecutionContext.InvokeCommand.GetCommand($commandName, 'All')
-                if ($command -is [System.Management.Automation.AliasInfo])
-                {
-                    $commandName = $command.ResolvedCommandName
-                }
-
-                if ($commandName -ne $null)
-                {
-                    Get-Help $commandName -ShowWindow
-                }
-            }
-        }
-    }
-
     # The next four key handlers are designed to make entering matched quotes
     # parens, and braces a nicer experience.  I'd like to include functions
     # in the module that do this, but this implementation still isn't as smart
