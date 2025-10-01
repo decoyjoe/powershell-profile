@@ -18,20 +18,25 @@ Pass the name of the profiles in the `profiles` directory that you'd like to ena
 Use `-Force` to overwriting an existing profile script if one already exists.
 
 .EXAMPLE
+./install.ps1
+
+Demonstrates installing the PowerShell profile with all defaults.
+
+.EXAMPLE
 ./install.ps1 -Profile 'default', 'psreadline' -Theme 'decoyjoe.pure'
+
+Demonstrates installing the PowerShell profile with specific profiles and a specific theme.
 #>
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory)]
     # List of profile names, from the `profiles` directory, to enable in the PowerShell profile.
-    [String[]]$ProfileName,
+    [String[]] $ProfileName = @('default', 'psreadline'),
 
-    [Parameter(Mandatory)]
     # Name of theme to set in the profile.
-    [String]$ThemeName,
+    [String] $ThemeName = 'decoyjoe.pure',
 
     # Overwrite an existing profile.
-    [switch]$Force
+    [switch] $Force
 )
 
 $InformationPreference = 'Continue'
@@ -124,7 +129,7 @@ foreach ($command in @('powershell.exe', 'pwsh')) {
 }
 
 $homeDir = Resolve-Path -Path '~' | Select-Object -ExpandProperty 'ProviderPath'
-$profileConfig = Join-Path -Path $homeDir -ChildPath '.powershell-profile'
+$profileConfig = Join-Path -Path $homeDir -ChildPath '.powershell-profile-config.json'
 
 if (Test-Path -Path $profileConfig -PathType Leaf) {
     if (-not $Force) {

@@ -52,7 +52,7 @@ function Global:Import-Profile
     [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
     $homeDir = Resolve-Path -Path '~' | Select-Object -ExpandProperty 'ProviderPath'
-    $profileConfig = Join-Path -Path $homeDir -ChildPath '.powershell-profile'
+    $profileConfig = Join-Path -Path $homeDir -ChildPath '.powershell-profile-config.json'
 
     if (-not (Test-Path -Path $profileConfig -PathType Leaf)) {
         $installPs1Path = Join-Path $PSScriptRoot -ChildPath 'install.ps1' -Resolve
@@ -82,8 +82,8 @@ function Global:Import-Profile
             continue
         }
 
-        # Execute profile scripts, not dot source. Profile scripts should be explicit with what they export by using the
-        # 'Global:' scope modifier.
+        # Execute profile scripts, don't dot-source them. Profile scripts should be explicit with what they export by
+        # using the 'Global:' scope modifier.
         Write-Verbose -Message ('Loading "{0}"' -f $profilePath)
         Write-Timing -Status 'BEGIN' -Message ('Load "{0}" profile' -f $profileName)
         & $profilePath
@@ -96,7 +96,7 @@ function Global:Import-Profile
         Import-Module -Name 'oh-my-posh'
         Write-Timing -Status 'COMPLETE' -Message 'Import module "oh-my-posh"'
 
-        $themesLocation = Join-Path -Path $PSScriptRoot -ChildPath 'oh-my-posh_themes' -Resolve
+        $themesLocation = Join-Path -Path $PSScriptRoot -ChildPath 'themes' -Resolve
         $Global:ThemeSettings.MyThemesLocation = $themesLocation # oh-my-posh uses $Global:ThemeSettings
         Set-Theme -Name $config.Theme
     }
