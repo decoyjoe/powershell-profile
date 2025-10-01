@@ -59,16 +59,26 @@ function Write-Theme {
         $null = $PSBoundParameters.Remove('Format')
         $LastCommand = Get-History -Count 1 @PSBoundParameters
         if(-not $LastCommand) { return '' }
-        $Duration = $LastCommand.EndExecutionTime - $LastCommand.StartExecutionTime
-        $Format -f $Duration
+        $LastCommand.EndExecutionTime - $LastCommand.StartExecutionTime
     }
 
     # Add timestamp
     $timestamp = Get-Date -Format T
-    $elapsed = Get-CommandExecutionTime -Format '{0:m\:ss\.ff}'
-    $elapsedTimestamp = ' [{0} | {1}]' -f $elapsed, $timestamp
-    $prompt += Set-CursorForRightBlockWrite -textLength ($elapsedTimestamp.Length)
-    $prompt += Write-Prompt $elapsedTimestamp -ForegroundColor $sl.Colors.PromptForegroundColor
+    $elapsed = Get-CommandExecutionTime
+
+    $elapsedTime = "$($elapsed.Seconds)s $($elapsed.Milliseconds)ms"
+
+    if ($elapsed.Minutes -ne 0) {
+        $elapsedTime = "$($elapsed.Minutes)m ${elapsedTime}"
+    }
+
+    if ($elapsed.Hours -ne 0) {
+        $elapsedTime = "$($elapsed.Hours)h ${elapsedTime}"
+    }
+
+    $elapsedTimeAndCurrentTime = ' [{0} | {1}]' -f $elapsedTime, $timestamp
+    $prompt += Set-CursorForRightBlockWrite -textLength ($elapsedTimeAndCurrentTime.Length)
+    $prompt += Write-Prompt $elapsedTimeAndCurrentTime -ForegroundColor $sl.Colors.PromptForegroundColor
 
     # New line
     $prompt += Set-Newline
