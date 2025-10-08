@@ -30,7 +30,7 @@ function Write-Theme {
 
     $status = Get-VCSStatus
     if ($status) {
-        $prompt += Write-Prompt -Object "$($status.Branch)" -ForegroundColor $sl.Colors.GitDefaultColor
+        $prompt += Write-Prompt -Object "$($status.Branch)" -ForegroundColor ([ConsoleColor]::Blue)
         if ($status.Working.Length -gt 0) {
             $prompt += Write-Prompt -Object (" " + $sl.PromptSymbols.GitDirtyIndicator + ' ') -ForegroundColor $sl.Colors.GitDirtyIndicatorColor
         }
@@ -66,19 +66,23 @@ function Write-Theme {
     $timestamp = Get-Date -Format T
     $elapsed = Get-CommandExecutionTime
 
-    $elapsedTime = "$($elapsed.Seconds)s $($elapsed.Milliseconds)ms"
+    $elapsedTime = "$($elapsed.Milliseconds)ms"
+
+    if ($elapsed.Seconds -ne 0) {
+        $elapsedTime = "$($elapsed.Seconds)s"
+    }
 
     if ($elapsed.Minutes -ne 0) {
-        $elapsedTime = "$($elapsed.Minutes)m ${elapsedTime}"
+        $elapsedTime = "$($elapsed.Minutes)m $($elapsed.Seconds)s"
     }
 
     if ($elapsed.Hours -ne 0) {
-        $elapsedTime = "$($elapsed.Hours)h ${elapsedTime}"
+        $elapsedTime = "$($elapsed.Hours)h $($elapsed.Minutes)m"
     }
 
-    $elapsedTimeAndCurrentTime = ' [{0} | {1}]' -f $elapsedTime, $timestamp
+    $elapsedTimeAndCurrentTime = ' {0} | {1}' -f $elapsedTime, $timestamp
     $prompt += Set-CursorForRightBlockWrite -textLength ($elapsedTimeAndCurrentTime.Length)
-    $prompt += Write-Prompt $elapsedTimeAndCurrentTime -ForegroundColor $sl.Colors.PromptForegroundColor
+    $prompt += Write-Prompt $elapsedTimeAndCurrentTime -ForegroundColor ([ConsoleColor]::DarkGray)
 
     # New line
     $prompt += Set-Newline
@@ -105,6 +109,7 @@ $sl.Colors.PromptSymbolColor = [ConsoleColor]::Green
 $sl.Colors.PromptHighlightColor = [ConsoleColor]::Blue
 $sl.Colors.DriveForegroundColor = [ConsoleColor]::Cyan
 $sl.Colors.WithForegroundColor = [ConsoleColor]::Red
-$sl.PromptSymbols.GitDirtyIndicator = [char]::ConvertFromUtf32(10007)
+# $sl.PromptSymbols.GitDirtyIndicator = [char]::ConvertFromUtf32(10007) # X cross mark
+$sl.PromptSymbols.GitDirtyIndicator = '*'  # X cross mark
 $sl.Colors.GitDefaultColor =[ConsoleColor]::Yellow
-$sl.Colors.GitDirtyIndicatorColor =[ConsoleColor]::Red
+$sl.Colors.GitDirtyIndicatorColor =[ConsoleColor]::Yellow
