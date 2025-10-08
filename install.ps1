@@ -56,7 +56,7 @@ foreach ($profileItem in $ProfileName) {
 # not include logic in the profile to check for required modules everytime the profiles are loaded.
 $modules = @{
     'oh-my-posh' = '2.*'
-    'Pester' = '4.*'
+    'Pester' = '5.*'
     'posh-git' = '0.*'
 }
 
