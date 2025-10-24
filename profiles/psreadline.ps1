@@ -1,4 +1,7 @@
 
+Set-PSReadLineKeyHandler -Key 'Alt+Backspace' -Function BackwardKillWord
+Set-PSReadLineKeyHandler -Key 'Alt+LeftArrow' -Function BackwardWord
+Set-PSReadLineKeyHandler -Key 'Alt+RightArrow' -Function BackwardWord
 Set-PSReadlineKeyHandler -Key UpArrow   -Function HistorySearchBackward
 Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
