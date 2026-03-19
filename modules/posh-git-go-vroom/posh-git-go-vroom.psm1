@@ -3055,15 +3055,6 @@ $script:vstsCommandsWithLongParams = $longVstsParams.Keys -join '|'
 # End Anchor   ($|[|;`n])
 $script:GitProxyFunctionRegex = "(^|[;`n])(\s*)(?<cmd>$(Get-AliasPattern git))(?<params>(([^\S\r\n]|[^\S\r\n]``\r?\n)+\S+)*)(([^\S\r\n]|[^\S\r\n]``\r?\n)+\`$args)(\s|``\r?\n)*($|[|;`n])"
 
-try {
-    if ($null -ne (git help -a 2>&1 | Select-String flow)) {
-        $script:someCommands += 'flow'
-    }
-}
-catch {
-    Write-Debug "Search for 'flow' in 'git help' output failed with error: $_"
-}
-
 filter quoteStringWithSpecialChars {
     if ($_ -and ($_ -match '\s+|#|@|\$|;|,|''|\{|\}|\(|\)')) {
         $str = $_ -replace "'", "''"
