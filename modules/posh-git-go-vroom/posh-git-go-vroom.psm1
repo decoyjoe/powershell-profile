@@ -54,9 +54,6 @@ Write-DebugTiming -Label 'GitParamTabExpansion.ps1'
 . $PSScriptRoot\GitTabExpansion.ps1
 Write-DebugTiming -Label 'GitTabExpansion.ps1'
 
-. $PSScriptRoot\TortoiseGit.ps1
-Write-DebugTiming -Label 'TortoiseGit.ps1'
-
 $IsAdmin = Test-Administrator
 
 # Get the default prompt definition.
