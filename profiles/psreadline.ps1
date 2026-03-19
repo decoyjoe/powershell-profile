@@ -16,7 +16,7 @@ Set-PSReadlineKeyHandler -Key "Enter" -Function AcceptLine
 # PowerShell on Windows takes a second or two to exit for some reason ¯\_(ツ)_/¯
 # Add some feedback
 Set-PSReadLineKeyHandler -Key 'Ctrl+d' -ScriptBlock {
-    Write-Host "$([Environment]::NewLine)[exiting]"
+    Write-Host "$([Environment]::NewLine)[exited]"
     [Environment]::Exit(0)
 }
 
