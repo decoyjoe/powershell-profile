@@ -3439,13 +3439,6 @@ function GitTabExpansionInternal($lastBlock, $GitStatus = $null) {
     }
 }
 
-function WriteTabExpLog([string] $Message) {
-    if (!$global:GitTabSettings.EnableLogging) { return }
-
-    $timestamp = Get-Date -Format HH:mm:ss
-    "[$timestamp] $Message" | Out-File -Append $global:GitTabSettings.LogPath
-}
-
 if (!$UseLegacyTabExpansion -and ($PSVersionTable.PSVersion.Major -ge 6)) {
     $cmdNames = "git","tgit","gitk"
 
@@ -3464,7 +3457,6 @@ if (!$UseLegacyTabExpansion -and ($PSVersionTable.PSVersion.Major -ge 6)) {
         $padLength = $cursorPosition - $commandAst.Extent.StartOffset
         $textToComplete = $commandAst.ToString().PadRight($padLength, ' ').Substring(0, $padLength)
 
-        WriteTabExpLog "Expand: command: '$($commandAst.Extent.Text)', padded: '$textToComplete', padlen: $padLength"
         Expand-GitCommand $textToComplete
     }
 }
@@ -3477,7 +3469,6 @@ else {
             $line = $Context.Line
             $lastBlock = [regex]::Split($line, '[|;]')[-1].TrimStart()
             $TabExpansionHasOutput.Value = $true
-            WriteTabExpLog "PowerTab expand: '$lastBlock'"
             Expand-GitCommand $lastBlock
         }
 
@@ -3490,9 +3481,9 @@ else {
 
         switch -regex ($lastBlock) {
             # Execute git tab completion for all git-related commands
-            "^$(Get-AliasPattern git) (.*)"  { WriteTabExpLog $msg; Expand-GitCommand $lastBlock }
-            "^$(Get-AliasPattern tgit) (.*)" { WriteTabExpLog $msg; Expand-GitCommand $lastBlock }
-            "^$(Get-AliasPattern gitk) (.*)" { WriteTabExpLog $msg; Expand-GitCommand $lastBlock }
+            "^$(Get-AliasPattern git) (.*)"  { Expand-GitCommand $lastBlock }
+            "^$(Get-AliasPattern tgit) (.*)" { Expand-GitCommand $lastBlock }
+            "^$(Get-AliasPattern gitk) (.*)" { Expand-GitCommand $lastBlock }
         }
     }
 }
