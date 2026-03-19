@@ -3,7 +3,7 @@ Set-StrictMode -Version 'Latest'
 
 $modulesToImport = @(
     # 'Pester' # This module takes ~2 seconds to load.
-    Join-Path -Path $PSScriptRoot -ChildPath '..\modules\posh-git-go-vroom'
+    (Join-Path -Path $PSScriptRoot -ChildPath '..\modules\posh-git-go-vroom')
 )
 
 foreach ($module in $modulesToImport)
