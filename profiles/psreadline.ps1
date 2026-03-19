@@ -9,11 +9,12 @@ Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 Set-PSReadlineKeyHandler -Key Tab -Function Complete
 Set-PSReadlineKeyHandler -Key "Ctrl+l" -Function ClearScreen
 Set-PSReadlineKeyHandler -Key "Enter" -Function AcceptLine
-Set-PSReadlineKeyHandler -Key "Ctrl+d" -Function DeleteCharOrExit
 
-Set-PSReadlineKeyHandler -Key "Ctrl+Alt+U" -ScriptBlock {
-    Set-Location -Path (Get-Location | Split-Path)
-    [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+# PowerShell on Windows takes a second or two to exit for some reason ¯\_(ツ)_/¯
+# Add some feedback
+Set-PSReadLineKeyHandler -Key 'Ctrl+d' -ScriptBlock {
+    Write-Host "$([Environment]::NewLine)[exiting]"
+    [Environment]::Exit(0)
 }
 
 # Needed to get Ctrl+v paste working for pwsh in WSL
