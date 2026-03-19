@@ -92,6 +92,14 @@ function Global:Import-Profile
 
     if (-not $SkipTheme)
     {
+        $ohMyPoshMonkeyPatchSignal = Join-Path -Path $PSScriptRoot -ChildPath '.oh-my-posh-v2-monkey-patched'
+        if (-not (Test-Path -Path $ohMyPoshMonkeyPatchSignal))
+        {
+            # oh-my-posh v2 has a hardcoded requirement on the "posh-git" module. Moneky-patch that requirement out.
+            & (Join-Path -Path $PSScriptRoot -ChildPath 'Edit-OhMyPosh.ps1')
+            Set-Content -Path $ohMyPoshMonkeyPatchSignal -Value (Get-Date)
+        }
+
         Write-Timing -Status 'BEGIN' -Message 'Import module "oh-my-posh"'
         Import-Module -Name 'oh-my-posh'
         Write-Timing -Status 'COMPLETE' -Message 'Import module "oh-my-posh"'

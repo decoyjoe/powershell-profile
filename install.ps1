@@ -57,7 +57,6 @@ foreach ($profileItem in $ProfileName) {
 $modules = @{
     'oh-my-posh' = '2.*'
     'Pester' = '5.*'
-    'posh-git' = '0.*'
 }
 
 $installedModules = Get-Module -ListAvailable

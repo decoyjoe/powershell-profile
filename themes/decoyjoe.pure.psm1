@@ -1,4 +1,5 @@
-#requires -Version 2 -Modules posh-git
+# Requires that you first import posh-git-go-vroom in the modules directory above
+
 # Adapted from: https://github.com/JanDeDobbeleer/oh-my-posh/blob/master/Themes/pure.psm1
 
 function Write-Theme {

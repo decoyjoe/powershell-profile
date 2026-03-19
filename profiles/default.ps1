@@ -3,7 +3,7 @@ Set-StrictMode -Version 'Latest'
 
 $modulesToImport = @(
     # 'Pester' # This module takes ~2 seconds to load.
-    'posh-git'
+    Join-Path -Path $PSScriptRoot -ChildPath '..\modules\posh-git-go-vroom'
 )
 
 foreach ($module in $modulesToImport)
@@ -12,6 +12,3 @@ foreach ($module in $modulesToImport)
     Import-Module -Name $module -Global
     Write-Timing -Status 'COMPLETE' -Message ('Import module "{0}"' -f $module)
 }
-
-# Prevent posh-git from rewriting the windows/tab title
-$GitPromptSettings.EnableWindowTitle = $false
