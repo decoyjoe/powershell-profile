@@ -23,14 +23,14 @@ Use `-Force` to overwriting an existing profile script if one already exists.
 Demonstrates installing the PowerShell profile with all defaults.
 
 .EXAMPLE
-./install.ps1 -Profile 'default', 'psreadline' -Theme 'decoyjoe.pure'
+./install.ps1 -Profile 'psreadline' -Theme 'decoyjoe.pure'
 
 Demonstrates installing the PowerShell profile with specific profiles and a specific theme.
 #>
 [CmdletBinding()]
 param(
     # List of profile names, from the `profiles` directory, to enable in the PowerShell profile.
-    [String[]] $ProfileName = @('default', 'psreadline'),
+    [String[]] $ProfileName = @('psreadline'),
 
     # Name of theme to set in the profile.
     [String] $ThemeName = 'decoyjoe.pure',

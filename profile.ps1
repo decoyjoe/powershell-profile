@@ -71,6 +71,12 @@ function Global:Import-Profile
         return
     }
 
+    #region Default profile is inline
+    Write-Timing -Status 'BEGIN' -Message 'Import posh-git-go-vroom'
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'modules\posh-git-go-vroom') -Global
+    Write-Timing -Status 'COMPLETE' -Message 'Import posh-git-go-vroom'
+    #endregion
+
     $profilesRoot = Join-Path -Path $PSScriptRoot -ChildPath 'profiles' -Resolve
     foreach ($profileName in $profilesToLoad)
     {
