@@ -1,4 +1,4 @@
-param([bool]$ForcePoshGitPrompt, [bool]$UseLegacyTabExpansion, [bool]$EnableProxyFunctionExpansion)
+param([bool]$ForcePoshGitPrompt, [bool]$UseLegacyTabExpansion)
 
 $debugTiming = $true
 
@@ -3032,22 +3032,6 @@ $script:gitCommandsWithParamValues = $gitParamValues.Keys -join '|'
 $script:vstsCommandsWithShortParams = $shortVstsParams.Keys -join '|'
 $script:vstsCommandsWithLongParams = $longVstsParams.Keys -join '|'
 
-# The regular expression here is roughly follows this pattern:
-#
-# <begin anchor><whitespace>*<git>(<whitespace><parameter>)*<whitespace>+<$args><whitespace>*<end anchor>
-#
-# The delimiters inside the parameter list and between some of the elements are non-newline whitespace characters ([^\S\r\n]).
-# In those instances, newlines are only allowed if they preceded by a non-newline whitespace character.
-#
-# Begin anchor (^|[;`n])
-# Whitespace   (\s*)
-# Git Command  (?<cmd>$(GetAliasPattern git))
-# Parameters   (?<params>(([^\S\r\n]|[^\S\r\n]``\r?\n)+\S+)*)
-# $args Anchor (([^\S\r\n]|[^\S\r\n]``\r?\n)+\`$args)
-# Whitespace   (\s|``\r?\n)*
-# End Anchor   ($|[|;`n])
-$script:GitProxyFunctionRegex = "(^|[;`n])(\s*)(?<cmd>$(Get-AliasPattern git))(?<params>(([^\S\r\n]|[^\S\r\n]``\r?\n)+\S+)*)(([^\S\r\n]|[^\S\r\n]``\r?\n)+\`$args)(\s|``\r?\n)*($|[|;`n])"
-
 filter quoteStringWithSpecialChars {
     if ($_ -and ($_ -match '\s+|#|@|\$|;|,|''|\{|\}|\(|\)')) {
         $str = $_ -replace "'", "''"
@@ -3455,34 +3439,6 @@ function GitTabExpansionInternal($lastBlock, $GitStatus = $null) {
     }
 }
 
-function Expand-GitProxyFunction($command) {
-    # Make sure the incoming command matches: <Command> <Args>, so we can extract the alias/command
-    # name and the arguments being passed in.
-    if ($command -notmatch '^(?<command>\S+)([^\S\r\n]|[^\S\r\n]`\r?\n)+(?<args>([^\S\r\n]|[^\S\r\n]`\r?\n|\S)*)$') {
-        return $command
-    }
-
-    # Store arguments for replacement later
-    $arguments = $matches['args']
-
-    # Get the command name; if an alias exists, get the actual command name
-    $commandName = $matches['command']
-    if (Test-Path -Path Alias:\$commandName) {
-        $commandName = Get-Item -Path Alias:\$commandName | Select-Object -ExpandProperty 'ResolvedCommandName'
-    }
-
-    # Extract definition of git usage
-    if (Test-Path -Path Function:\$commandName) {
-        $definition = Get-Item -Path Function:\$commandName | Select-Object -ExpandProperty 'Definition'
-        if ($definition -match $script:GitProxyFunctionRegex) {
-            # Clean up the command by removing extra delimiting whitespace and backtick preceding newlines
-            return (("$($matches['cmd'].TrimStart()) $($matches['params']) $arguments") -replace '`\r?\n', ' ' -replace '\s+', ' ')
-        }
-    }
-
-    return $command
-}
-
 function WriteTabExpLog([string] $Message) {
     if (!$global:GitTabSettings.EnableLogging) { return }
 
@@ -3497,15 +3453,6 @@ if (!$UseLegacyTabExpansion -and ($PSVersionTable.PSVersion.Major -ge 6)) {
     $cmdNamesPattern = "^($($cmdNames -join '|'))(\.exe)?$"
     $cmdNames += Get-Alias | Where-Object { $_.Definition -match $cmdNamesPattern } | Foreach-Object Name
 
-    if ($EnableProxyFunctionExpansion) {
-        $funcNames += Get-ChildItem -Path Function:\ | Where-Object { $_.Definition -match $script:GitProxyFunctionRegex } | Foreach-Object Name
-        $cmdNames += $funcNames
-
-        # Create regex pattern from $funcNames e.g.: ^(Git-Checkout|Git-Switch)$
-        $funcNamesPattern = "^($($funcNames -join '|'))$"
-        $cmdNames += Get-Alias | Where-Object { $_.Definition -match $funcNamesPattern } | Foreach-Object Name
-    }
-
     $global:GitTabSettings.RegisteredCommands = $cmdNames -join ", "
 
     Microsoft.PowerShell.Core\Register-ArgumentCompleter -CommandName $cmdNames -Native -ScriptBlock {
@@ -3516,9 +3463,6 @@ if (!$UseLegacyTabExpansion -and ($PSVersionTable.PSVersion.Major -ge 6)) {
         # The Expand-GitCommand expects this trailing space, so pad with a space if necessary.
         $padLength = $cursorPosition - $commandAst.Extent.StartOffset
         $textToComplete = $commandAst.ToString().PadRight($padLength, ' ').Substring(0, $padLength)
-        if ($EnableProxyFunctionExpansion) {
-            $textToComplete = Expand-GitProxyFunction($textToComplete)
-        }
 
         WriteTabExpLog "Expand: command: '$($commandAst.Extent.Text)', padded: '$textToComplete', padlen: $padLength"
         Expand-GitCommand $textToComplete
@@ -3532,9 +3476,6 @@ else {
 
             $line = $Context.Line
             $lastBlock = [regex]::Split($line, '[|;]')[-1].TrimStart()
-            if ($EnableProxyFunctionExpansion) {
-                $lastBlock = Expand-GitProxyFunction($lastBlock)
-            }
             $TabExpansionHasOutput.Value = $true
             WriteTabExpLog "PowerTab expand: '$lastBlock'"
             Expand-GitCommand $lastBlock
@@ -3545,9 +3486,6 @@ else {
 
     function TabExpansion($line, $lastWord) {
         $lastBlock = [regex]::Split($line, '[|;]')[-1].TrimStart()
-        if ($EnableProxyFunctionExpansion) {
-            $lastBlock = Expand-GitProxyFunction($lastBlock)
-        }
         $msg = "Legacy expand: '$lastBlock'"
 
         switch -regex ($lastBlock) {
