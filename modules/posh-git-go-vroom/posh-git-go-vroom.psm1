@@ -1,6 +1,6 @@
 param([bool]$ForcePoshGitPrompt, [bool]$UseLegacyTabExpansion)
 
-$debugTiming = $true
+$debugTiming = $false
 
 # ============================================================================
 #region Initialization
