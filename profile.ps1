@@ -62,7 +62,7 @@ function Global:Import-Profile
         Write-Error -Message $err -ErrorAction Stop
     }
 
-    $config = Get-Content -Path $profileConfig -Raw | ConvertFrom-Json
+    $config = [IO.File]::ReadAllText($profileConfig) | ConvertFrom-Json
     $profilesToLoad = $config.ProfilesToLoad
 
     if (-not $profilesToLoad)
@@ -84,7 +84,6 @@ function Global:Import-Profile
 
         # Execute profile scripts, don't dot-source them. Profile scripts should be explicit with what they export by
         # using the 'Global:' scope modifier.
-        Write-Verbose -Message ('Loading "{0}"' -f $profilePath)
         Write-Timing -Status 'BEGIN' -Message ('Load "{0}" profile' -f $profileName)
         & $profilePath
         Write-Timing -Status 'COMPLETE' -Message ('Load "{0}" profile' -f $profileName)
