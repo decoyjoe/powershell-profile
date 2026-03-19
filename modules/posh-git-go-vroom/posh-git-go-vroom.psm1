@@ -3440,15 +3440,7 @@ function GitTabExpansionInternal($lastBlock, $GitStatus = $null) {
 }
 
 if (!$UseLegacyTabExpansion -and ($PSVersionTable.PSVersion.Major -ge 6)) {
-    $cmdNames = "git","tgit","gitk"
-
-    # Create regex pattern from $cmdNames: ^(git|git\.exe|tgit|tgit\.exe|gitk|gitk\.exe)$
-    $cmdNamesPattern = "^($($cmdNames -join '|'))(\.exe)?$"
-    $cmdNames += Get-Alias | Where-Object { $_.Definition -match $cmdNamesPattern } | Foreach-Object Name
-
-    $global:GitTabSettings.RegisteredCommands = $cmdNames -join ", "
-
-    Microsoft.PowerShell.Core\Register-ArgumentCompleter -CommandName $cmdNames -Native -ScriptBlock {
+    Microsoft.PowerShell.Core\Register-ArgumentCompleter -CommandName 'git' -Native -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorPosition)
 
         # The PowerShell completion has a habit of stripping the trailing space when completing:
