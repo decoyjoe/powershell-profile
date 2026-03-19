@@ -1,10 +1,13 @@
 
+Set-PSReadLineOption -HistorySearchCursorMovesToEnd
+Set-PSReadLineOption -BellStyle None
+Set-PSReadLineOption -MaximumHistoryCount 10240
+
 Set-PSReadLineKeyHandler -Key 'Alt+Backspace' -Function BackwardKillWord
 Set-PSReadLineKeyHandler -Key 'Alt+LeftArrow' -Function BackwardWord
 Set-PSReadLineKeyHandler -Key 'Alt+RightArrow' -Function BackwardWord
-Set-PSReadlineKeyHandler -Key UpArrow   -Function HistorySearchBackward
+Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
-Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
 Set-PSReadlineKeyHandler -Key Tab -Function Complete
 Set-PSReadlineKeyHandler -Key "Ctrl+l" -Function ClearScreen
