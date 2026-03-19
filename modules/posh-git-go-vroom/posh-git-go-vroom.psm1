@@ -1,22 +1,61 @@
 param([bool]$ForcePoshGitPrompt, [bool]$UseLegacyTabExpansion, [bool]$EnableProxyFunctionExpansion)
 
+$debugTiming = $false
+
+#region Initialization
+$debugTimer = if ($debugTiming) { [System.Diagnostics.Stopwatch]::StartNew() }
+
+function Write-DebugTiming
+{
+    param(
+        [string] $Label
+    )
+
+    if (-not $debugTiming) { return }
+
+    $debugTimer.Stop()
+    Write-Host "[posh-git-go-vroom] [${Label}] $($debugTimer.ElapsedMilliseconds)ms" -ForegroundColor Cyan
+    $debugTimer.Restart()
+}
+
 if (Test-Path Env:\POSHGIT_ENABLE_STRICTMODE) {
     # Set strict mode to latest to help catch scripting errors in the module. This is done by the Pester tests.
     Set-StrictMode -Version Latest
 }
 
 . $PSScriptRoot\CheckRequirements.ps1 > $null
+Write-DebugTiming -Label 'CheckRequirements.ps1'
+#endregion
 
 . $PSScriptRoot\ConsoleMode.ps1
+Write-DebugTiming -Label 'ConsoleMode.ps1'
+
 . $PSScriptRoot\Utils.ps1
+Write-DebugTiming -Label 'Utils.ps1'
+
 . $PSScriptRoot\AnsiUtils.ps1
+Write-DebugTiming -Label 'AnsiUtils.ps1'
+
 . $PSScriptRoot\WindowTitle.ps1
+Write-DebugTiming -Label 'WindowTitle.ps1'
+
 . $PSScriptRoot\PoshGitTypes.ps1
+Write-DebugTiming -Label 'PoshGitTypes.ps1'
+
 . $PSScriptRoot\GitUtils.ps1
+Write-DebugTiming -Label 'GitUtils.ps1'
+
 . $PSScriptRoot\GitPrompt.ps1
+Write-DebugTiming -Label 'GitPrompt.ps1'
+
 . $PSScriptRoot\GitParamTabExpansion.ps1
+Write-DebugTiming -Label 'GitParamTabExpansion.ps1'
+
 . $PSScriptRoot\GitTabExpansion.ps1
+Write-DebugTiming -Label 'GitTabExpansion.ps1'
+
 . $PSScriptRoot\TortoiseGit.ps1
+Write-DebugTiming -Label 'TortoiseGit.ps1'
 
 $IsAdmin = Test-Administrator
 
